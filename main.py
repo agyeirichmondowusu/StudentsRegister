@@ -142,7 +142,7 @@ def send_email_with_attachment():
         # Send the email
         server.sendmail("agyeirichmondowusu@gmail.com", "richowusumond@gmail.com", msg.as_string())
         server.quit()  # Close the connection
-        print(f"Email sent to {"richowusumond@gmail.com"}")
+        print(f"Email sent to richowusumond@gmail.com")
     except Exception as e:
         print(f"Error sending email: {e}")
 
