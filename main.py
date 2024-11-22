@@ -302,56 +302,59 @@ async def mark_attendance(request: Request):
                 print("matches: ", matches)
                 print("faceDis: ", faceDis)
                 print("type of face dis", type(faceDis))
-                
 
-                matchIndex = np.argmin(faceDis)#returns the index of the first occurrence of the minimum value in the array
-                print("match index", matchIndex)
-                print("member id: ", memberIds[matchIndex])
-
-                recorded_ids.append(memberIds[matchIndex])
-                if matches[matchIndex]:
-                    student_id = int(memberIds[matchIndex])#somce all ids are integers, student id must be converted into an integer before using it. The database wasn't having values for ID when we first used it, and that was why it wasn't updating the csv file
-                    if not monitor_checked_attendance[str(student_id)]:# if attendance is not taken
-
-                        print("type of member id: ", type(memberIds[matchIndex]))
-
-                        time_of_attendance = now.strftime("%H:%M:%S")
-                        if int(student_id) in df['ID'].values:
-                            print("type of df[id]: ", type(df['ID']))
-                            df.loc[df['ID'] == int(student_id), new_column_name] = time_of_attendance
-
-                        df.to_csv(csv_path_on_firebase, index=False)
-
-                        member_id = memberIds[matchIndex]
-                        monitor_checked_attendance[member_id] = True
-                        # cv2.putText(frame, f"Welcome {member_id}", (50, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2)
-                        # cv2.putText(frame, f'Welcome {str(member_id)}', (50, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2)#to display the welcome message
-                        student_marked = member_id
-                        upload_csv_to_firebase()
-                        send_email_with_attachment()
-                        return student_marked
-                
+                if faceDis.size > 0:
+                    matchIndex = np.argmin(faceDis)#returns the index of the first occurrence of the minimum value in the array
+                    print("match index", matchIndex)
+                    print("member id: ", memberIds[matchIndex])
+    
+                    recorded_ids.append(memberIds[matchIndex])
+                    if matches[matchIndex]:
+                        student_id = int(memberIds[matchIndex])#somce all ids are integers, student id must be converted into an integer before using it. The database wasn't having values for ID when we first used it, and that was why it wasn't updating the csv file
+                        if not monitor_checked_attendance[str(student_id)]:# if attendance is not taken
+    
+                            print("type of member id: ", type(memberIds[matchIndex]))
+    
+                            time_of_attendance = now.strftime("%H:%M:%S")
+                            if int(student_id) in df['ID'].values:
+                                print("type of df[id]: ", type(df['ID']))
+                                df.loc[df['ID'] == int(student_id), new_column_name] = time_of_attendance
+    
+                            df.to_csv(csv_path_on_firebase, index=False)
+    
+                            member_id = memberIds[matchIndex]
+                            monitor_checked_attendance[member_id] = True
+                            # cv2.putText(frame, f"Welcome {member_id}", (50, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2)
+                            # cv2.putText(frame, f'Welcome {str(member_id)}', (50, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2)#to display the welcome message
+                            student_marked = member_id
+                            upload_csv_to_firebase()
+                            send_email_with_attachment()
+                            return student_marked
+                    
+                    else:
+                        print(f"Closer to threshold {studentIds[matchIndex]}")
+                        student_id = int(memberIds[matchIndex])#somce all ids are integers, student id must be converted into an integer before using it. The database wasn't having values for ID when we first used it, and that was why it wasn't updating the csv file
+                        if not monitor_checked_attendance[str(student_id)]:# if attendance is not taken
+    
+                            print("type of member id: ", type(memberIds[matchIndex]))
+    
+                            time_of_attendance = f'{now.strftime("%H:%M:%S")}-low conf'
+                            if int(student_id) in df['ID'].values:
+                                print("type of df[id]: ", type(df['ID']))
+                                df.loc[df['ID'] == int(student_id), new_column_name] = time_of_attendance
+    
+                            df.to_csv(csv_path_on_firebase, index=False)
+    
+                            member_id = memberIds[matchIndex]
+                            monitor_checked_attendance[member_id] = True
+                            # cv2.putText(frame, f"Welcome {member_id}", (50, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2)
+                            # cv2.putText(frame, f'Welcome {str(member_id)}', (50, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2)#to display the welcome message
+                            student_marked = member_id
+                            upload_csv_to_firebase()
+                            send_email_with_attachment()
                 else:
-                    print(f"Closer to threshold {studentIds[matchIndex]}")
-                    student_id = int(memberIds[matchIndex])#somce all ids are integers, student id must be converted into an integer before using it. The database wasn't having values for ID when we first used it, and that was why it wasn't updating the csv file
-                    if not monitor_checked_attendance[str(student_id)]:# if attendance is not taken
-
-                        print("type of member id: ", type(memberIds[matchIndex]))
-
-                        time_of_attendance = f'{now.strftime("%H:%M:%S")}-low conf'
-                        if int(student_id) in df['ID'].values:
-                            print("type of df[id]: ", type(df['ID']))
-                            df.loc[df['ID'] == int(student_id), new_column_name] = time_of_attendance
-
-                        df.to_csv(csv_path_on_firebase, index=False)
-
-                        member_id = memberIds[matchIndex]
-                        monitor_checked_attendance[member_id] = True
-                        # cv2.putText(frame, f"Welcome {member_id}", (50, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2)
-                        # cv2.putText(frame, f'Welcome {str(member_id)}', (50, 100), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 255, 0), 2)#to display the welcome message
-                        student_marked = member_id
-                        upload_csv_to_firebase()
-                        send_email_with_attachment()
+                    print('Face distance is empty')
+                    
     return recorded_ids
     
 
